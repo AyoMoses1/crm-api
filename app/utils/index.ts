@@ -1,6 +1,7 @@
 import { AccessToken } from '@adonisjs/auth/access_tokens'
 import { Response } from '@adonisjs/core/http'
-import { DateTimeFormatOptions } from 'luxon'
+import { randomBytes } from 'crypto'
+import { DateTime, DateTimeFormatOptions } from 'luxon'
 
 export const sendSuccessResponse = (
   response: Response,
@@ -87,4 +88,19 @@ export const formatTimestamp = (timestamp: string | null): string | null => {
   } else {
     return null
   }
+}
+
+export const hasDateExpired = (dateString: string) => {
+  const givenDate = DateTime.fromISO(dateString, { zone: 'utc' })
+  const now = DateTime.utc()
+  return givenDate < now
+}
+
+export const generateVerificationCode = () => {
+  return Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111
+}
+
+export const generateVerificationToken = (length: number = 32): string => {
+  const buffer = randomBytes(length)
+  return buffer.toString('base64url')
 }

@@ -5,4 +5,4 @@ router
   .group(() => {
     router.post('/register', [UserController, 'addUser'])
   })
-  .prefix('/api/v1/')
+  .prefix('/api/v1')

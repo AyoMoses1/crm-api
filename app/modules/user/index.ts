@@ -3,7 +3,7 @@ import User from '#models/user'
 import { Response } from '@adonisjs/core/http'
 import UserRole from '#models/user_role'
 import VerificationToken from '#models/verification_token'
-import { sendSuccessResponse } from '#utils/index'
+import { generateVerificationCode, sendSuccessResponse } from '#utils/index'
 import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
@@ -57,10 +57,6 @@ export const sendVerificationNotice = async (
     await sendEmailVerificationOTP(userId, trx)
     sendVerificationResponse(response, 'Email OTP sent for verification')
   }
-}
-
-export const generateVerificationCode = () => {
-  return Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111
 }
 
 export async function sendEmailVerificationOTP(
