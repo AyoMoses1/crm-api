@@ -15,9 +15,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare id: number
 
   @column()
-  declare gender: string
-
-  @column()
   declare first_name: string
 
   @column()
@@ -30,7 +27,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare email: string
 
   @column()
-  declare password_hash: string
+  declare password: string
 
   @column()
   declare is_active: boolean
