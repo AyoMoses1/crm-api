@@ -7,6 +7,7 @@ import { sendSuccessResponse } from '#utils/index'
 import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
+import logger from '@adonisjs/core/services/logger'
 
 export const createUser = async (user: UserPayload, trx: TransactionClientContract) => {
   try {
@@ -52,7 +53,6 @@ export const sendVerificationNotice = async (
   response?: Response
 ) => {
   await VerificationToken.query().where('user_id', '=', userId).delete()
-
   if (response) {
     await sendEmailVerificationOTP(userId, trx)
     sendVerificationResponse(response, 'Email OTP sent for verification')
@@ -68,6 +68,7 @@ export async function sendEmailVerificationOTP(
   dbTransaction: TransactionClientContract
 ) {
   const emailOTP = generateVerificationCode()
+  logger.info({ emailOTP })
   await VerificationToken.create(
     {
       user_id: userId,
@@ -79,7 +80,6 @@ export async function sendEmailVerificationOTP(
   )
 
   const userRef = await User.find(userId, { client: dbTransaction })
-  const BASE_URL = 'https://kano.tertiary.payprosolutionsltd.com'
 
   if (userRef) {
     await mail.send((message) => {
@@ -87,8 +87,8 @@ export async function sendEmailVerificationOTP(
         .to(userRef.email)
         .from('ayocandy1@gmail.com')
         .subject('Verify your email address')
-        .htmlView('emails/verify_email_html', {
-          action_url: `${BASE_URL}/email-verification?token=${emailOTP}&email=${userRef.email}`,
+        .htmlView('emails/verify_email', {
+          otp: emailOTP,
           email: userRef.email,
           name: userRef.first_name,
         })
