@@ -46,7 +46,7 @@ export function sendVerificationResponse(response: Response, msg?: string) {
   sendSuccessResponse(response, msg ?? 'Email OTP sent for verification')
 }
 
-export const fixsendVerificationNotice = async (
+export const sendVerificationNotice = async (
   userId: number,
   trx: TransactionClientContract,
   response?: Response
