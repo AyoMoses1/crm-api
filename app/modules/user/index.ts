@@ -109,3 +109,42 @@ export async function sendWelcomeEmail(user: User, dbTransaction: TransactionCli
     console.error('User not found')
   }
 }
+
+export const isAccountActive = async (
+  email: string
+): Promise<{ message: string; status: boolean; code: number; id?: number }> => {
+  const user = await User.findBy('email', email)
+  if (user) {
+    if (user.is_active) {
+      return { message: 'Account is active', status: true, code: 200, id: user.id }
+    } else {
+      return {
+        message: 'Account is inactive or deactivated',
+        status: false,
+        code: 409,
+        id: user.id,
+      }
+    }
+  } else {
+    return { message: 'Account not found', status: false, code: 404 }
+  }
+}
+
+export const isAccountVerified = async (
+  id: number
+): Promise<{ verifiedMessage: string; verifiedStatus: boolean; verifiedCode: number }> => {
+  const emailVerification = await EmailVerification.findBy('user_id', id)
+  if (emailVerification) {
+    if (emailVerification.status === 'Verified') {
+      return { verifiedMessage: 'Account is verified', verifiedStatus: true, verifiedCode: 200 }
+    } else {
+      return {
+        verifiedMessage: 'Account is Unverified or Archived',
+        verifiedStatus: false,
+        verifiedCode: 409,
+      }
+    }
+  } else {
+    return { verifiedMessage: 'Account not found', verifiedStatus: false, verifiedCode: 404 }
+  }
+}

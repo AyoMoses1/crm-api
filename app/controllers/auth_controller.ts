@@ -1,13 +1,15 @@
 import PasswordReset from '#models/password_reset'
 import User from '#models/user'
+import UserRole from '#models/user_role'
 import VerificationToken from '#models/verification_token'
 import {
   createPasswordResetToken,
   reverseVerifications,
   verifyEmailAddress,
 } from '#modules/auth/index'
+import { isAccountActive, isAccountVerified } from '#modules/user/index'
 import { AppError } from '#utils/error'
-import { hasDateExpired, sendErrorResponse, sendSuccessResponse } from '#utils/index'
+import { getTokenRes, hasDateExpired, sendErrorResponse, sendSuccessResponse } from '#utils/index'
 import type { HttpContext } from '@adonisjs/core/http'
 import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
@@ -61,7 +63,36 @@ export default class AuthController {
         sendSuccessResponse(response, 'Password reset successful')
       })
     } catch (error) {
-      await sendErrorResponse(response, error.statusCode, error.message)
+      sendErrorResponse(response, error.statusCode, error.message)
+    }
+  }
+
+  async login({ request, response }: HttpContext) {
+    try {
+      const { email, password } = request.only(['email', 'password'])
+      const { status, code, message, id } = await isAccountActive(email)
+      if (!status) return sendErrorResponse(response, code, message)
+      if (id) {
+        const { verifiedStatus, verifiedCode, verifiedMessage } = await isAccountVerified(id)
+        if (!verifiedStatus) return sendErrorResponse(response, verifiedCode, verifiedMessage)
+      }
+      const user = await User.verifyCredentials(email, password)
+      const role = await UserRole.query()
+        .select(['id', 'role_id'])
+        .where('user_id', user.id)
+        .preload('role')
+
+      const token = await User.accessTokens.create(user)
+      sendSuccessResponse(response, 'User logged in successfully', {
+        ...getTokenRes(token),
+        id: user.id,
+        name: `${user.first_name} ${user.last_name}`,
+        email: user.email,
+        role: role ? { ...role[0].toJSON() } : null,
+      })
+    } catch (error) {
+      console.log(error)
+      sendErrorResponse(response, 403, error.message)
     }
   }
 }

@@ -24,5 +24,5 @@ export default class RolePermission extends BaseModel {
   declare role: HasOne<typeof Role>
 
   @hasMany(() => Permission, { foreignKey: 'id', localKey: 'permission_id' })
-  declare permission: HasMany<typeof Permission>
+  declare permissions: HasMany<typeof Permission>
 }

@@ -17,7 +17,7 @@ export default class UserRole extends BaseModel {
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
-  @hasOne(() => Role, { foreignKey: 'role_id', localKey: 'role' })
+  @hasOne(() => Role, { foreignKey: 'id', localKey: 'role_id' })
   declare role: HasOne<typeof Role>
 
   @hasOne(() => User, { foreignKey: 'id', localKey: 'user_id' })
