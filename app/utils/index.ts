@@ -1,6 +1,6 @@
 import { AccessToken } from '@adonisjs/auth/access_tokens'
 import { Response } from '@adonisjs/core/http'
-import { randomBytes } from 'crypto'
+import { randomBytes } from 'node:crypto'
 import { DateTime, DateTimeFormatOptions } from 'luxon'
 
 export const sendSuccessResponse = (
