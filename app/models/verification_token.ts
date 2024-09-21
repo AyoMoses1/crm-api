@@ -19,7 +19,7 @@ export default class VerificationToken extends compose(BaseModel, AuthFinder) {
   declare user_id: number
 
   @column({ serializeAs: null })
-  declare token: number
+  declare token: string
 
   @column()
   declare used: boolean

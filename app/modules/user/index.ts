@@ -72,7 +72,7 @@ export async function sendEmailVerificationOTP(
   await VerificationToken.create(
     {
       user_id: userId,
-      token: emailOTP,
+      token: String(emailOTP),
       used: false,
       expires_at: DateTime.now().plus({ hours: 24 }),
     },
