@@ -4,5 +4,6 @@ const AuthController = () => import('#controllers/auth_controller')
 router
   .group(() => {
     router.post('/verify-email', [AuthController, 'verifyEmail'])
+    router.post('/set-password', [AuthController, 'setPassword'])
   })
   .prefix('/api/v1/auth')
