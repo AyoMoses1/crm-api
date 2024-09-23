@@ -95,4 +95,10 @@ export default class AuthController {
       sendErrorResponse(response, 403, error.message)
     }
   }
+
+  async google({ ally }: HttpContext) {
+    return ally.use('google').redirect((request) => {
+      request.param('access_type', 'offline').param('prompt', 'select_account')
+    })
+  }
 }
