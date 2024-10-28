@@ -27,3 +27,30 @@ export const registerUserValidator = vine.compile(
     }),
   })
 )
+
+export const addClientValidator = vine.compile(
+  vine.object({
+    first_name: vine.string().trim().minLength(3),
+    last_name: vine.string().trim().minLength(3),
+    email: vine
+      .string()
+      .trim()
+      .email()
+      .unique(async (db, value) => {
+        const client = await db.from('clients').where('email', value).first()
+        return !client
+      }),
+    phone_number: vine
+      .string()
+      .trim()
+      .minLength(11)
+      .unique(async (db, value) => {
+        const client = await db.from('clients').where('phone_number', value).first()
+        return !client
+      }),
+    country: vine.string().trim().minLength(3),
+    company: vine.string().trim().minLength(3).optional(),
+    address: vine.string().trim().minLength(3),
+    state: vine.string().trim().minLength(3),
+  })
+)

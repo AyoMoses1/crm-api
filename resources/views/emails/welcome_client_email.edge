@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /* General Styles */
+      
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+      }
+      
+      table {
+        border-spacing: 0;
+        width: 100%;
+      }
+      
+      td {
+        padding: 0;
+      }
+      
+      /* Email Container */
+      
+      .email-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Header Section */
+      
+      .email-header {
+        background-color: #4a90e2;
+        padding: 30px;
+        text-align: center;
+        color: #ffffff;
+      }
+      
+      .email-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      
+      /* Body Section */
+      
+      .email-body {
+        padding: 20px;
+        color: #333333;
+        line-height: 1.6;
+      }
+      
+      .email-body h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      
+      .email-body p {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+      
+      /* Call to Action Button */
+      
+      .email-body .cta-button {
+        display: inline-block;
+        padding: 15px 25px;
+        background-color: #4a90e2;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      
+      /* Footer Section */
+      
+      .email-footer {
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 20px;
+        font-size: 14px;
+        color: #999999;
+      }
+      
+      .email-footer a {
+        color: #4a90e2;
+        text-decoration: none;
+      }
+      
+      /* Responsive Styles */
+      
+      @media only screen and (max-width: 600px) {
+        .email-header h1 {
+          font-size: 24px;
+        }
+      
+        .email-body h2 {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <table role="presentation" class="email-container">
+      <!-- Header -->
+      <tr>
+        <td>
+          <div class="email-header">
+            <h1>
+              Welcome to [CRM Name]!
+            </h1>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Body -->
+      <tr>
+        <td>
+          <div class="email-body">
+            <h2>
+              Hello [Client Name],
+            </h2>
+            <p>
+              We're excited to welcome you to [CRM Name], your all-in-one solution for managing your clients, appointments, and business growth.
+            </p>
+            <p>
+              Start organizing your business efficiently with our range of tools designed to help you keep track of your clients, payments, services, and more!
+            </p>
+            <a href="[Your CRM URL]" class="cta-button">Get Started</a>
+            <p>
+              If you have any questions or need assistance, feel free to reach out to us at [Support Email]. We're here to help!
+            </p>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td>
+          <div class="email-footer">
+            <p>
+              &copy; 2024 [CRM Name] | <a href="[CRM Website]">Visit Our Website</a>
+            </p>
+            <p>
+              You received this email because you're now a valued user of [CRM Name]. If you wish to
+              unsubscribe, <a href="[Unsubscribe Link]">click here</a>.
+            </p>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

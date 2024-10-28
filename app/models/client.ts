@@ -26,6 +26,12 @@ export default class Client extends BaseModel {
   declare company: string | null
 
   @column()
+  declare country: string | null
+
+  @column()
+  declare state: string | null
+
+  @column()
   declare address: string | null
 
   @column.dateTime({ autoCreate: true })

@@ -8,6 +8,7 @@ import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
 import logger from '@adonisjs/core/services/logger'
+import Client from '#models/client'
 
 export const createUser = async (user: UserPayload, trx: TransactionClientContract) => {
   try {
@@ -103,6 +104,26 @@ export async function sendWelcomeEmail(user: User, dbTransaction: TransactionCli
         .subject('Verify your email address')
         .htmlView('welcome', {
           Student: userRef,
+        })
+    })
+  } else {
+    console.error('User not found')
+  }
+}
+
+export async function sendWelcomeEmailToClient(
+  client: Client,
+  dbTransaction: TransactionClientContract
+) {
+  const clientRef = await Client.find(client.id, { client: dbTransaction })
+  if (clientRef) {
+    await mail.send((message) => {
+      message
+        .to(clientRef.email)
+        .from('ayocandy1@gmail.com')
+        .subject('Verify your email address')
+        .htmlView('emails/welcome_client_email', {
+          Client: clientRef,
         })
     })
   } else {
