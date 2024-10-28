@@ -54,3 +54,33 @@ export const addClientValidator = vine.compile(
     state: vine.string().trim().minLength(3),
   })
 )
+
+export const updateClientValidator = vine.compile(
+  vine.object({
+    first_name: vine.string().trim().minLength(3).optional(),
+    last_name: vine.string().trim().minLength(3).optional(),
+    email: vine
+      .string()
+      .trim()
+      .email()
+      .unique(async (db, value) => {
+        const client = await db.from('clients').where('email', value).first()
+        return !client
+      })
+      .optional(),
+    phone_number: vine
+      .string()
+      .trim()
+      .minLength(11)
+
+      .unique(async (db, value) => {
+        const client = await db.from('clients').where('phone_number', value).first()
+        return !client
+      })
+      .optional(),
+    country: vine.string().trim().minLength(3).optional(),
+    company: vine.string().trim().minLength(3).optional(),
+    address: vine.string().trim().minLength(3).optional(),
+    state: vine.string().trim().minLength(3).optional(),
+  })
+)

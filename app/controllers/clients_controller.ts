@@ -1,7 +1,7 @@
-import { addClient } from '#modules/client/index'
+import { addClient, fetchAllClients, fetchClientById, updateClient } from '#modules/client/index'
 import { sendWelcomeEmailToClient } from '#modules/user/index'
 import { sendErrorResponse, sendSuccessResponse } from '#utils/index'
-import { addClientValidator } from '#validators/registration'
+import { addClientValidator, updateClientValidator } from '#validators/registration'
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 
@@ -17,5 +17,45 @@ export default class ClientsController {
         return sendErrorResponse(response, 422, 'Registration failed.')
       }
     })
+  }
+
+  async getAllClients({ request, response }: HttpContext) {
+    const page = request.input('page', 1) // Default to page 1
+    const limit = request.input('limit', 10) // Default to 10 clients per page
+
+    const clients = await fetchAllClients(page, limit)
+
+    if (clients.length > 0) {
+      sendSuccessResponse(response, 'Clients list fetched successfully', clients)
+    } else {
+      return sendErrorResponse(response, 404, 'No clients found.')
+    }
+  }
+
+  async getClientDetails({ params, response }: HttpContext) {
+    const clientId = params.id
+
+    const client = await fetchClientById(clientId)
+
+    if (client) {
+      sendSuccessResponse(response, 'Client details fetched successfully', client)
+    } else {
+      return sendErrorResponse(response, 404, 'Client not found.')
+    }
+  }
+
+  async updateClient({ request, params, response }: HttpContext) {
+    const clientId = params.id
+
+    // await db.transaction(async (trx) => {
+    const payload = await request.validateUsing(updateClientValidator)
+
+    const client = await updateClient(clientId, payload)
+    if (client) {
+      sendSuccessResponse(response, 'Client details updated successfully', client)
+    } else {
+      return sendErrorResponse(response, 404, 'Client not found.')
+    }
+    // })
   }
 }

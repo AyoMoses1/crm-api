@@ -22,3 +22,24 @@ export const addClient = async (client: ClientPayload, trx: TransactionClientCon
     throw new Error('Account creation failed')
   }
 }
+
+export const fetchAllClients = async (page: number, limit: number) => {
+  return await Client.query().paginate(page, limit)
+}
+
+export const fetchClientById = async (id: number) => {
+  return await Client.query().where('id', id).first()
+}
+
+export const updateClient = async (clientId: number, payload: any) => {
+  const client = await Client.find(clientId)
+
+  if (!client) {
+    return null
+  }
+
+  client.merge(payload)
+  await client.save()
+
+  return client
+}
