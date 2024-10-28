@@ -6,19 +6,16 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.integer('user_id').unsigned().references('id').inTable('users').onDelete('SET NULL') // Foreign key to users
+      table.string('first_name').notNullable()
+      table.string('last_name').notNullable()
+      table.string('phone_number').notNullable().unique()
+      table.string('email').notNullable().unique()
       table.string('company').nullable()
+      table.string('state').notNullable()
+      table.string('country').notNullable()
       table.string('address').nullable()
       table.timestamp('created_at')
       table.timestamp('updated_at')
-
-      /*
-      
-     adonis make:migration create_clients_table 
-}
-      
-      
-      */
     })
   }
 
