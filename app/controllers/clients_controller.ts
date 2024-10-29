@@ -46,8 +46,14 @@ export default class ClientsController {
 
   async updateClient({ request, params, response }: HttpContext) {
     const clientId = params.id
+    const requestBody = request.all()
+    const allowedFields = ['first_name', 'last_name', 'state', 'country', 'address']
+    const extraFields = Object.keys(requestBody).filter((field) => !allowedFields.includes(field))
 
-    // await db.transaction(async (trx) => {
+    if (extraFields.length > 0) {
+      return sendErrorResponse(response, 422, 'Extra fields are not allowed', extraFields)
+    }
+
     const payload = await request.validateUsing(updateClientValidator)
 
     const client = await updateClient(clientId, payload)
@@ -56,6 +62,5 @@ export default class ClientsController {
     } else {
       return sendErrorResponse(response, 404, 'Client not found.')
     }
-    // })
   }
 }
