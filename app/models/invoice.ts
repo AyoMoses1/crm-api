@@ -10,7 +10,7 @@ export default class Invoice extends BaseModel {
   declare id: number
 
   @column()
-  declare client_id: number
+  declare clientId: number
 
   @column()
   declare invoice_number: string
