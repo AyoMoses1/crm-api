@@ -4,6 +4,7 @@ interface UserPayload {
   email: string
   phone_number: string
   role_id: number
+  avatar?: string
 }
 
 interface ClientPayload {
@@ -15,4 +16,5 @@ interface ClientPayload {
   country: string
   address: string
   company?: string
+  avatar?: string
 }

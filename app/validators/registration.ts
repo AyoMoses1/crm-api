@@ -25,6 +25,7 @@ export const registerUserValidator = vine.compile(
       const role = await db.from('roles').where('id', value).first()
       return !!role
     }),
+    avatar: vine.file(),
   })
 )
 
@@ -52,6 +53,7 @@ export const addClientValidator = vine.compile(
     company: vine.string().trim().minLength(3).optional(),
     address: vine.string().trim().minLength(3),
     state: vine.string().trim().minLength(3),
+    avatar: vine.file(),
   })
 )
 

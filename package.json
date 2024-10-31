@@ -60,6 +60,7 @@
     "@adonisjs/lucid": "^21.2.0",
     "@adonisjs/mail": "^9.2.2",
     "@vinejs/vine": "^2.1.0",
+    "cloudinary": "^2.5.1",
     "edge.js": "^6.2.0",
     "luxon": "^3.5.0",
     "pg": "^8.13.0",

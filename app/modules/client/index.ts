@@ -13,6 +13,7 @@ export const addClient = async (client: ClientPayload, trx: TransactionClientCon
         company: client.company,
         country: client.country,
         state: client.state,
+        avatar: client.avatar,
       },
       { client: trx }
     )

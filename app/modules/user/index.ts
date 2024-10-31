@@ -19,6 +19,7 @@ export const createUser = async (user: UserPayload, trx: TransactionClientContra
         last_name: user.last_name,
         phone_number: user.phone_number,
         is_active: true,
+        avatar: user.avatar,
       },
       { client: trx }
     )

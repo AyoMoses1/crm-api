@@ -1,5 +1,6 @@
 import { addClient, fetchAllClients, fetchClientById, updateClient } from '#modules/client/index'
 import { sendWelcomeEmailToClient } from '#modules/user/index'
+import { uploadImage } from '#services/cloudinary'
 import { sendErrorResponse, sendSuccessResponse } from '#utils/index'
 import { addClientValidator, updateClientValidator } from '#validators/registration'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -9,7 +10,9 @@ export default class ClientsController {
   async addClient({ request, response }: HttpContext) {
     await db.transaction(async (trx) => {
       const payload = await request.validateUsing(addClientValidator)
-      const client = await addClient(payload, trx)
+      const avatar = payload.avatar
+      const result = await uploadImage(avatar.tmpPath ?? '')
+      const client = await addClient({ ...payload, avatar: result.url ?? '' }, trx)
       if (client.$isPersisted) {
         await sendWelcomeEmailToClient(client, trx)
         sendSuccessResponse(response, 'client registered successfully')

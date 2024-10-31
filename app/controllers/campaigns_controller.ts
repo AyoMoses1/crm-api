@@ -115,7 +115,7 @@ export default class CampaignsController {
   async getAllCampaigns({ request, response }: HttpContext) {
     try {
       const page = request.input('page', 1)
-      const limit = request.input('limit', 10)
+      const limit = request.input('limit', 20)
 
       const campaigns = await fetchAllCampaigns(page, limit)
 
