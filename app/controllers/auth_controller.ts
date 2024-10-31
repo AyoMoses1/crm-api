@@ -9,7 +9,13 @@ import {
 } from '#modules/auth/index'
 import { isAccountActive, isAccountVerified } from '#modules/user/index'
 import { AppError } from '#utils/error'
-import { getTokenRes, hasDateExpired, sendErrorResponse, sendSuccessResponse } from '#utils/index'
+import {
+  getDashboardModulesForRole,
+  getTokenRes,
+  hasDateExpired,
+  sendErrorResponse,
+  sendSuccessResponse,
+} from '#utils/index'
 import type { HttpContext } from '@adonisjs/core/http'
 import hash from '@adonisjs/core/services/hash'
 import logger from '@adonisjs/core/services/logger'
@@ -77,10 +83,15 @@ export default class AuthController {
         if (!verifiedStatus) return sendErrorResponse(response, verifiedCode, verifiedMessage)
       }
       const user = await User.verifyCredentials(email, password)
-      const role = await UserRole.query()
+      const userRole = await UserRole.query()
         .select(['id', 'role_id'])
         .where('user_id', user.id)
         .preload('role')
+        .first()
+
+      const dashboardModules = getDashboardModulesForRole(
+        userRole?.role.name.toLocaleLowerCase() ?? ''
+      )
 
       const token = await User.accessTokens.create(user)
       sendSuccessResponse(response, 'User logged in successfully', {
@@ -88,7 +99,8 @@ export default class AuthController {
         id: user.id,
         name: `${user.first_name} ${user.last_name}`,
         email: user.email,
-        role: role ? { ...role[0].toJSON() } : null,
+        role: userRole ? { ...userRole.toJSON() } : null,
+        dashboardModules,
       })
     } catch (error) {
       console.log(error)

@@ -16,6 +16,9 @@ export default class Service extends BaseModel {
   @column()
   declare price: number
 
+  @column()
+  declare status: 'enabled' | 'disabled'
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

@@ -12,7 +12,7 @@ export default class InvoiceItem extends BaseModel {
   declare invoiceId: number
 
   @column()
-  declare service_id: number
+  declare serviceId: number
 
   // @column()
   // declare description: string

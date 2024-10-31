@@ -2,6 +2,7 @@ import { AccessToken } from '@adonisjs/auth/access_tokens'
 import { Response } from '@adonisjs/core/http'
 import { randomBytes } from 'node:crypto'
 import { DateTime, DateTimeFormatOptions } from 'luxon'
+import { roleDashboardModules } from './data.js'
 
 export const sendSuccessResponse = (
   response: Response,
@@ -103,4 +104,8 @@ export const generateVerificationCode = () => {
 export const generateVerificationToken = (length: number = 32): string => {
   const buffer = randomBytes(length)
   return buffer.toString('base64url')
+}
+
+export const getDashboardModulesForRole = (role: string): string[] => {
+  return roleDashboardModules[role] || []
 }

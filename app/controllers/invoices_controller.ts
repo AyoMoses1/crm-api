@@ -27,7 +27,7 @@ export default class InvoicesController {
 
       await InvoiceItem.create({
         invoiceId: invoice.id,
-        service_id: serviceRecord.id,
+        serviceId: serviceRecord.id,
         quantity: service.quantity,
         price: invoice.amount,
       })
@@ -38,6 +38,21 @@ export default class InvoicesController {
     await invoice.save()
 
     return response.status(201).json({ message: 'Invoice generated successfully', invoice })
+  }
+
+  // fetch all invoices
+  async fetchAllInvoices({ response }: HttpContext) {
+    try {
+      const invoices = await Invoice.query()
+        .preload('client') // preload the client related to the invoice
+        .preload('items', (itemsQuery) => {
+          itemsQuery.preload('service')
+        })
+
+      return sendSuccessResponse(response, 'Invoices fetched successfully', invoices)
+    } catch (error) {
+      return sendErrorResponse(response, 500, 'Error fetching invoices', error)
+    }
   }
 
   // Update invoice status

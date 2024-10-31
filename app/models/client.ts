@@ -23,6 +23,9 @@ export default class Client extends BaseModel {
   declare email: string
 
   @column()
+  declare avatar: string | null
+
+  @column()
   declare company: string | null
 
   @column()
