@@ -131,6 +131,13 @@ export async function sendWelcomeEmailToClient(
   }
 }
 
+export const fetchAllUsers = async (page: number, limit: number) => {
+  return await User.query()
+    .select('id', 'first_name', 'last_name', 'email', 'is_active', 'phone_number', 'avatar')
+    .preload('role', (roleQuery) => roleQuery.preload('role'))
+    .paginate(page, limit)
+}
+
 export const isAccountActive = async (
   email: string
 ): Promise<{ message: string; status: boolean; code: number; id?: number }> => {

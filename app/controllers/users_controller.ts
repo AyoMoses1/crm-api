@@ -1,8 +1,8 @@
 import { registerUserValidator } from '#validators/registration'
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
-import { createUser, sendVerificationNotice } from '../modules/user/index.js'
-import { sendErrorResponse } from '#utils/index'
+import { createUser, fetchAllUsers, sendVerificationNotice } from '../modules/user/index.js'
+import { sendErrorResponse, sendSuccessResponse } from '#utils/index'
 
 export default class UsersController {
   async addUser({ request, response }: HttpContext) {
@@ -15,5 +15,18 @@ export default class UsersController {
         return sendErrorResponse(response, 422, 'Registration failed.')
       }
     })
+  }
+
+  async getAllUsers({ request, response }: HttpContext) {
+    const page = request.input('page', 1) // Default to page 1
+    const limit = request.input('limit', 10) // Default to 10 clients per page
+
+    const clients = await fetchAllUsers(page, limit)
+
+    if (clients.length > 0) {
+      sendSuccessResponse(response, 'Clients list fetched successfully', clients)
+    } else {
+      return sendErrorResponse(response, 404, 'No clients found.')
+    }
   }
 }
