@@ -2,6 +2,7 @@ import {
   scheduleAppointment,
   rescheduleAppointment,
   cancelAppointment,
+  getAllAppointments,
 } from '#modules/appointment/index'
 import { sendErrorResponse, sendSuccessResponse } from '#utils/index'
 import {
@@ -55,6 +56,21 @@ export default class AppointmentsController {
       sendSuccessResponse(response, 'Appointment cancelled successfully', appointment)
     } else {
       return sendErrorResponse(response, 404, 'Appointment not found.')
+    }
+    // })
+  }
+
+  async fetchAppointments({ response, request }: HttpContext) {
+    const page = request.input('page', 1) // Default to page 1
+    const limit = request.input('limit', 10) //
+
+    // await db.transaction(async (trx) => {
+    const appointments = await getAllAppointments(page, limit)
+
+    if (appointments) {
+      sendSuccessResponse(response, 'Appointment fetched successfully', appointments)
+    } else {
+      return sendErrorResponse(response, 404, 'Appointments not found.')
     }
     // })
   }

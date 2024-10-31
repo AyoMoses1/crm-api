@@ -131,6 +131,28 @@ export async function sendWelcomeEmailToClient(
   }
 }
 
+export async function sendCampaignEmailToClient(
+  client: Client,
+  dbTransaction: TransactionClientContract,
+  campaign: any
+) {
+  const clientRef = await Client.find(client.id, { client: dbTransaction })
+  if (clientRef) {
+    await mail.send((message) => {
+      message
+        .to(clientRef.email)
+        .from('ayocandy1@gmail.com')
+        .subject(campaign.email_header)
+        .htmlView('emails/campaign_email', {
+          client: clientRef,
+          campaign,
+        })
+    })
+  } else {
+    console.error('User not found')
+  }
+}
+
 export const fetchAllUsers = async (page: number, limit: number) => {
   return await User.query()
     .select('id', 'first_name', 'last_name', 'email', 'is_active', 'phone_number', 'avatar')

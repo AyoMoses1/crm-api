@@ -4,6 +4,7 @@ const AppointmentsController = () => import('#controllers/appointments_controlle
 router
   .group(() => {
     router.post('/appointments', [AppointmentsController, 'scheduleAppointment'])
+    router.get('/appointments', [AppointmentsController, 'fetchAppointments'])
     router.put('/appointments/:id', [AppointmentsController, 'rescheduleAppointment'])
     router.delete('/appointments/:id', [AppointmentsController, 'cancelAppointment'])
   })

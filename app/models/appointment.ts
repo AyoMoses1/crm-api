@@ -8,7 +8,7 @@ export default class Appointment extends BaseModel {
   declare id: number
 
   @column()
-  declare client_id: number
+  declare clientId: number
 
   @column.dateTime()
   declare appointment_date: DateTime

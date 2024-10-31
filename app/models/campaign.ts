@@ -22,6 +22,18 @@ export default class Campaign extends BaseModel {
   @column()
   declare status: 'draft' | 'active' | 'completed'
 
+  @column()
+  declare image: string | null
+
+  @column()
+  declare email_header: string | null
+
+  @column()
+  declare email_sub_header: string | null
+
+  @column()
+  declare channel: 'email' | 'whatsapp' | 'sms'
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

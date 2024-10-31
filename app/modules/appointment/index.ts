@@ -30,3 +30,7 @@ export const cancelAppointment = async (appointmentId: number) => {
 
   return appointment
 }
+
+export const getAllAppointments = async (page: number, limit: number) => {
+  return await Appointment.query().preload('client').paginate(page, limit)
+}

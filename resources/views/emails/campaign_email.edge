@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Email Template
+    </title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+      
+      .email-container {
+        max-width: 600px;
+        background-color: #ffffff;
+        margin: 20px auto;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      }
+      
+      .header {
+        background-color: #333;
+        padding: 20px;
+        text-align: center;
+        color: #fff;
+      }
+      
+      .header img {
+        max-width: 100px;
+        margin-bottom: 10px;
+      }
+      
+      .header h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin: 0;
+      }
+      
+      .hero-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      
+      .content {
+        padding: 20px;
+        text-align: center;
+        background-color: #fafafa;
+      }
+      
+      .content h2 {
+        font-size: 24px;
+        color: #333;
+        margin: 0;
+      }
+      
+      .content p {
+        font-size: 16px;
+        color: #666;
+        line-height: 1.6;
+        margin: 10px 0;
+      }
+      
+      .cta-button {
+        display: inline-block;
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 12px 20px;
+        margin-top: 15px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+      
+      .cta-button:hover {
+        background-color: #0056b3;
+      }
+      
+      .footer {
+        padding: 20px;
+        text-align: center;
+        background-color: #333;
+        color: #fff;
+      }
+      
+      .footer a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      
+      .footer a:hover {
+        color: #0056b3;
+      }
+      
+      .social-icons {
+        margin: 20px 0;
+      }
+      
+      .social-icons img {
+        width: 24px;
+        margin: 0 8px;
+        vertical-align: middle;
+      }
+      
+      .footer p {
+        font-size: 14px;
+        margin: 10px 0 0;
+        color: #ccc;
+      }
+      
+      /* Media Query for Desktop */
+      
+      @media (min-width: 600px) {
+        .hero-image img {
+          max-height: 250px;
+          object-fit: cover;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="header">
+        <!-- Replace the src with your logo image -->
+        <img
+          src="https://res.cloudinary.com/ccx/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1728320669/logo_ggdfls.png"
+          alt="Logo"
+        />
+      </div>
+
+      <div class="hero-image">
+        <img src={{campaign.image}} alt="Hero Image" />
+      </div>
+
+      <div class="content">
+        <h2>
+          How are we doing?
+        </h2>
+        <p>
+          Dear {{client.first_name}},<br />
+          {{ campaign.description }}
+        </p>
+        <p>
+          Your feedback is a vital part of shaping the future of our studio, and as a thank you, we're offering an exclusive 10% discount on your next class package. Your insights propel us forward, and we're excited to evolve together.
+        </p>
+        <p>
+          Namaste, The Borcelle Team
+        </p>
+        <a href="https://your-survey-link.com" class="cta-button">Go to link</a>
+      </div>
+
+      <div class="footer">
+        <div class="social-icons">
+          <!-- Replace with your social media icons -->
+          <a href="#">            <img src="https://img.icons8.com/ios-filled/50/ffffff/phone.png" alt="Phone" /></a>
+          <a href="#">            <img src="https://img.icons8.com/ios-filled/50/ffffff/email.png" alt="Email" /></a>
+          <a href="#">            <img src="https://img.icons8.com/ios-filled/50/ffffff/website.png" alt="Website" /></a>
+        </div>
+        <a href="https://valonconsultinggroup.com">reallygreatsite.com</a>
+        <p>
+          &copy; 2024 Your Company Name. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
