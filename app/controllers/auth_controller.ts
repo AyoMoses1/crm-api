@@ -25,10 +25,10 @@ import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 export default class AuthController {
   async verifyEmail({ request, response }: HttpContext) {
     try {
-      const { email, otp } = request.body()
+      const { email, token } = request.body()
       const user = await User.findBy('email', email)
       if (user) {
-        const emailVerification = await verifyEmailAddress(user, otp)
+        const emailVerification = await verifyEmailAddress(user, token)
         logger.info({ emailVerification })
         if (emailVerification) {
           await VerificationToken.query().where('user_id', '=', user.id).delete()
@@ -99,6 +99,7 @@ export default class AuthController {
         id: user.id,
         name: `${user.first_name} ${user.last_name}`,
         email: user.email,
+        avatar: user.avatar,
         role: userRole ? { ...userRole.toJSON() } : null,
         dashboardModules,
       })

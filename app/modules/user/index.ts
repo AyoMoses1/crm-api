@@ -3,11 +3,10 @@ import User from '#models/user'
 import { Response } from '@adonisjs/core/http'
 import UserRole from '#models/user_role'
 import VerificationToken from '#models/verification_token'
-import { generateVerificationCode, sendSuccessResponse } from '#utils/index'
+import { generateVerificationToken, sendSuccessResponse } from '#utils/index'
 import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
-import logger from '@adonisjs/core/services/logger'
 import Client from '#models/client'
 
 export const createUser = async (user: UserPayload, trx: TransactionClientContract) => {
@@ -65,12 +64,11 @@ export async function sendEmailVerificationOTP(
   userId: number,
   dbTransaction: TransactionClientContract
 ) {
-  const emailOTP = generateVerificationCode()
-  logger.info({ emailOTP })
+  const token = generateVerificationToken()
   await VerificationToken.create(
     {
       user_id: userId,
-      token: String(emailOTP),
+      token,
       used: false,
       expires_at: DateTime.now().plus({ hours: 24 }),
     },
@@ -86,7 +84,7 @@ export async function sendEmailVerificationOTP(
         .from('ayocandy1@gmail.com')
         .subject('Verify your email address')
         .htmlView('emails/verify_email', {
-          otp: emailOTP,
+          token: token,
           email: userRef.email,
           name: userRef.first_name,
         })
@@ -147,6 +145,28 @@ export async function sendCampaignEmailToClient(
         .htmlView('emails/campaign_email', {
           client: clientRef,
           campaign,
+        })
+    })
+  } else {
+    console.error('User not found')
+  }
+}
+
+export async function sendInvoiceEmailToClient(
+  client: Client,
+  dbTransaction: TransactionClientContract,
+  invoice: any
+) {
+  const clientRef = await Client.find(client.id, { client: dbTransaction })
+  if (clientRef) {
+    await mail.send((message) => {
+      message
+        .to(clientRef.email)
+        .from('ayocandy1@gmail.com')
+        .subject('invoice')
+        .htmlView('emails/invoice_email', {
+          in: clientRef,
+          invoice,
         })
     })
   } else {
