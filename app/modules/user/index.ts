@@ -122,7 +122,7 @@ export async function sendWelcomeEmailToClient(
         .from('ayocandy1@gmail.com')
         .subject('Verify your email address')
         .htmlView('emails/welcome_client_email', {
-          Client: clientRef,
+          client: clientRef,
         })
     })
   } else {
