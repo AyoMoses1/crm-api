@@ -1,3 +1,5 @@
+import Client from '#models/client'
+import Invoice from '#models/invoice'
 import { addClient, fetchAllClients, fetchClientById, updateClient } from '#modules/client/index'
 import { sendWelcomeEmailToClient } from '#modules/user/index'
 import { uploadImage } from '#services/cloudinary'
@@ -21,6 +23,54 @@ export default class ClientsController {
         return sendErrorResponse(response, 422, 'Registration failed.')
       }
     })
+  }
+
+  async fetchClientInvoices({ params, response }: HttpContext) {
+    try {
+      const clientId = params.clientId
+
+      // Check if client exists
+      const client = await Client.findBy('id', clientId)
+      if (!client) {
+        return sendErrorResponse(response, 404, 'Client not found')
+      }
+
+      // Fetch all invoices for the client with related data
+      const invoices = await Invoice.query()
+        .where('client_id', clientId)
+        .preload('items', (itemsQuery) => {
+          itemsQuery.preload('service')
+        })
+        .orderBy('created_at', 'desc') // Most recent first
+
+      const transformedInvoices = invoices.map((invoice) => ({
+        id: invoice.id,
+        invoice_number: invoice.invoice_number,
+        status: invoice.status,
+        amount: invoice.amount,
+        created_at: invoice.createdAt,
+        updated_at: invoice.updatedAt,
+        items: invoice.items.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          service: {
+            id: item.service.id,
+            name: item.service.name,
+            price: item.service.price,
+          },
+          total: item.quantity * item.price,
+        })),
+      }))
+
+      return sendSuccessResponse(
+        response,
+        'Client invoices fetched successfully',
+        transformedInvoices
+      )
+    } catch (error) {
+      return sendErrorResponse(response, 500, 'Error fetching client invoices', error)
+    }
   }
 
   async getAllClients({ request, response }: HttpContext) {
