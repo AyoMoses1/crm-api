@@ -5,6 +5,7 @@ import { sendErrorResponse, sendSuccessResponse } from '#utils/index'
 import { addClientValidator, updateClientValidator } from '#validators/registration'
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import { DateTime } from 'luxon'
 
 export default class ClientsController {
   async addClient({ request, response }: HttpContext) {
@@ -44,6 +45,46 @@ export default class ClientsController {
       sendSuccessResponse(response, 'Client details fetched successfully', client)
     } else {
       return sendErrorResponse(response, 404, 'Client not found.')
+    }
+  }
+
+  async getClientStatistics({ response }: HttpContext) {
+    try {
+      const now = DateTime.now()
+      const startOfDay = now.startOf('day')
+      const startOfMonth = now.startOf('month')
+      const startOfYear = now.startOf('year')
+
+      // Get daily clients count
+      const dailyClients = await db
+        .from('clients')
+        .count('* as count')
+        .where('created_at', '>=', startOfDay.toSQL())
+        .first()
+
+      // Get monthly clients count
+      const monthlyClients = await db
+        .from('clients')
+        .count('* as count')
+        .where('created_at', '>=', startOfMonth.toSQL())
+        .first()
+
+      // Get yearly clients count
+      const yearlyClients = await db
+        .from('clients')
+        .count('* as count')
+        .where('created_at', '>=', startOfYear.toSQL())
+        .first()
+
+      const statistics = {
+        today: Number(dailyClients?.count || 0),
+        thisMonth: Number(monthlyClients?.count || 0),
+        thisYear: Number(yearlyClients?.count || 0),
+      }
+
+      return sendSuccessResponse(response, 'Client statistics fetched successfully', statistics)
+    } catch (error) {
+      return sendErrorResponse(response, 500, 'Failed to fetch client statistics')
     }
   }
 
