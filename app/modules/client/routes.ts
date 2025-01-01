@@ -8,6 +8,7 @@ router
     router.get('/clients', [ClientController, 'getAllClients'])
     router.get('/clients/:id', [ClientController, 'getClientDetails'])
     router.get('/client/:clientId/invoices', [ClientController, 'fetchClientInvoices'])
+    router.get('/client/:clientId/appointments', [ClientController, 'fetchClientAppointments'])
     router.put('/clients/:id', [ClientController, 'updateClient'])
   })
   .prefix('/api/v1')

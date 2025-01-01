@@ -1,3 +1,4 @@
+import Appointment from '#models/appointment'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
 import { addClient, fetchAllClients, fetchClientById, updateClient } from '#modules/client/index'
@@ -70,6 +71,49 @@ export default class ClientsController {
       )
     } catch (error) {
       return sendErrorResponse(response, 500, 'Error fetching client invoices', error)
+    }
+  }
+
+  async fetchClientAppointments({ params, response }: HttpContext) {
+    try {
+      const clientId = params.clientId
+
+      // Check if client exists
+      const client = await Client.findBy('id', clientId)
+      if (!client) {
+        return sendErrorResponse(response, 404, 'Client not found')
+      }
+
+      // Fetch all appointments for the client
+      const appointments = await Appointment.query()
+        .where('client_id', clientId)
+        .preload('client')
+        .orderBy('appointment_date', 'desc')
+
+      // If no appointments found, return empty array
+      if (!appointments || appointments.length === 0) {
+        return sendSuccessResponse(response, 'No appointments found for this client', [])
+      }
+
+      // Transform appointments to ensure consistent format
+      const transformedAppointments = appointments.map((appointment) => ({
+        id: appointment.id,
+        appointment_date: appointment.appointment_date,
+        description: appointment.description,
+        status: appointment.status,
+        created_at: appointment.createdAt,
+        updated_at: appointment.updatedAt,
+        client: appointment.client,
+      }))
+
+      return sendSuccessResponse(
+        response,
+        'Client appointments fetched successfully',
+        transformedAppointments
+      )
+    } catch (error) {
+      console.error('Error fetching client appointments:', error)
+      return sendErrorResponse(response, 500, 'Error fetching client appointments', error)
     }
   }
 
