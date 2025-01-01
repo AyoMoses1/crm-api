@@ -29,7 +29,6 @@ export default class AuthController {
       const user = await User.findBy('email', email)
       if (user) {
         const emailVerification = await verifyEmailAddress(user, token)
-        logger.info({ emailVerification })
         if (emailVerification) {
           await VerificationToken.query().where('user_id', '=', user.id).delete()
           const passwordResetToken = await createPasswordResetToken(user.id)
