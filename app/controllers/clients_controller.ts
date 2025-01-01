@@ -42,7 +42,23 @@ export default class ClientsController {
     const client = await fetchClientById(clientId)
 
     if (client) {
-      sendSuccessResponse(response, 'Client details fetched successfully', client)
+      // Transform the client data to ensure snake_case
+      const transformedClient = {
+        id: client.id,
+        first_name: client.first_name,
+        last_name: client.last_name,
+        email: client.email,
+        phone_number: client.phone_number,
+        company: client.company,
+        address: client.address,
+        state: client.state,
+        country: client.country,
+        avatar: client.avatar,
+        created_at: client.createdAt,
+        updated_at: client.updatedAt,
+      }
+
+      sendSuccessResponse(response, 'Client details fetched successfully', transformedClient)
     } else {
       return sendErrorResponse(response, 404, 'Client not found.')
     }
@@ -91,7 +107,7 @@ export default class ClientsController {
   async updateClient({ request, params, response }: HttpContext) {
     const clientId = params.id
     const requestBody = request.all()
-    const allowedFields = ['first_name', 'last_name', 'state', 'country', 'address']
+    const allowedFields = ['first_name', 'last_name', 'state', 'country', 'address', 'avatar']
     const extraFields = Object.keys(requestBody).filter((field) => !allowedFields.includes(field))
 
     if (extraFields.length > 0) {
@@ -99,8 +115,25 @@ export default class ClientsController {
     }
 
     const payload = await request.validateUsing(updateClientValidator)
+    let avatarUrl = undefined
 
-    const client = await updateClient(clientId, payload)
+    // Handle avatar update if a new file was uploaded
+    if (request.file('avatar')) {
+      const avatar = request.file('avatar')
+      if (avatar && avatar.tmpPath) {
+        const result = await uploadImage(avatar.tmpPath)
+        avatarUrl = result.url
+      }
+    }
+
+    // Create update payload with all fields
+    const updatePayload = {
+      ...payload,
+      ...(avatarUrl ? { avatar: avatarUrl } : {}), // Only include avatar if a new one was uploaded
+    }
+
+    const client = await updateClient(clientId, updatePayload)
+
     if (client) {
       sendSuccessResponse(response, 'Client details updated successfully', client)
     } else {
