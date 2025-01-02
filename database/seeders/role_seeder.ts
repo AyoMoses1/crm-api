@@ -5,20 +5,24 @@ export default class extends BaseSeeder {
   async run() {
     await Role.createMany([
       {
-        name: 'customer',
-        description: 'Regular user who can book hotels',
-      },
-      {
-        name: 'agent',
-        description: 'Agent who can list properties and manage bookings',
+        name: 'super_admin',
+        description: 'Has complete system access and control',
       },
       {
         name: 'admin',
-        description: 'Administrator with access to manage the platform',
+        description: 'Has administrative access with some restrictions',
       },
       {
-        name: 'super_admin',
-        description: 'Super administrator with full control over the system',
+        name: 'manager',
+        description: 'Can manage users and view system data',
+      },
+      {
+        name: 'staff',
+        description: 'Regular staff member with basic access',
+      },
+      {
+        name: 'user',
+        description: 'Basic user with limited access',
       },
     ])
   }
