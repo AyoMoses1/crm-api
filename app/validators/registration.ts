@@ -82,6 +82,13 @@ export const updateUserValidator = vine.compile(
   vine.object({
     first_name: vine.string().trim(),
     last_name: vine.string().trim(),
+    role_id: vine
+      .number()
+      .exists(async (db, value) => {
+        const role = await db.from('roles').where('id', value).first()
+        return !!role
+      })
+      .optional(),
     avatar: vine
       .file({
         size: '5mb',

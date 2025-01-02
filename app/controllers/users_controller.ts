@@ -49,28 +49,53 @@ export default class UsersController {
       // Validate request data
       const payload = await request.validateUsing(updateUserValidator)
 
-      // Handle avatar update if a new file was uploaded
-      let avatarUrl = undefined
-      if (request.file('avatar')) {
-        const avatar = request.file('avatar')
-        if (avatar && avatar.tmpPath) {
-          const result = await uploadImage(avatar.tmpPath)
-          avatarUrl = result.url
+      // Use transaction for consistent updates
+      const updatedUser = await db.transaction(async (trx) => {
+        // Handle avatar update if a new file was uploaded
+        let avatarUrl = undefined
+        if (request.file('avatar')) {
+          const avatar = request.file('avatar')
+          if (avatar && avatar.tmpPath) {
+            const result = await uploadImage(avatar.tmpPath)
+            avatarUrl = result.url
+          }
         }
-      }
 
-      // Create update payload with all allowed fields
-      const updatePayload = {
-        first_name: payload.first_name,
-        last_name: payload.last_name,
-        ...(avatarUrl ? { avatar: avatarUrl } : {}),
-      }
+        // Create update payload with all allowed fields
+        const updatePayload = {
+          first_name: payload.first_name,
+          last_name: payload.last_name,
+          ...(avatarUrl ? { avatar: avatarUrl } : {}),
+        }
 
-      // Update user
-      await user.merge(updatePayload).save()
+        // Update user basic info
+        await user.merge(updatePayload).save()
 
-      // Fetch updated user with relations
-      const updatedUser = await User.query().where('id', userId).preload('role').first()
+        // Update user role if provided
+        if (payload.role_id) {
+          // Find existing user role
+          const existingRole = await UserRole.query().where('user_id', userId).first()
+
+          if (existingRole) {
+            // Update existing role
+            await existingRole.merge({ role_id: payload.role_id }).save()
+          } else {
+            // Create new role association
+            await UserRole.create({
+              user_id: userId,
+              role_id: payload.role_id,
+            })
+          }
+        }
+
+        // Fetch updated user with relations
+        const updatedUser = await User.query({ client: trx })
+          .where('id', userId)
+          .preload('role')
+          .first()
+
+        return updatedUser
+      })
 
       if (!updatedUser) {
         return sendErrorResponse(response, 404, 'Failed to fetch updated user')
@@ -87,6 +112,12 @@ export default class UsersController {
         is_active: updatedUser.is_active,
         created_at: updatedUser.createdAt,
         updated_at: updatedUser.updatedAt,
+        role: updatedUser.role
+          ? {
+              id: updatedUser.role.id,
+              role_id: updatedUser.role.role_id,
+            }
+          : null,
       }
 
       return sendSuccessResponse(response, 'User details updated successfully', transformedUser)
