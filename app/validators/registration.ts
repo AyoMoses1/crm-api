@@ -77,3 +77,16 @@ export const updateClientValidator = vine.compile(
     state: vine.string().trim().minLength(3).optional(),
   })
 )
+
+export const updateUserValidator = vine.compile(
+  vine.object({
+    first_name: vine.string().trim(),
+    last_name: vine.string().trim(),
+    avatar: vine
+      .file({
+        size: '5mb',
+        extnames: ['jpg', 'jpeg', 'png'],
+      })
+      .optional(),
+  })
+)

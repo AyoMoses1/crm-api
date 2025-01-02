@@ -1,4 +1,4 @@
-import { registerUserValidator } from '#validators/registration'
+import { registerUserValidator, updateUserValidator } from '#validators/registration'
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import { createUser, fetchAllUsers, sendVerificationNotice } from '../modules/user/index.js'
@@ -33,6 +33,66 @@ export default class UsersController {
       sendSuccessResponse(response, 'Clients list fetched successfully', clients)
     } else {
       return sendErrorResponse(response, 404, 'No clients found.')
+    }
+  }
+
+  async updateUser({ request, params, response }: HttpContext) {
+    try {
+      const userId = params.id
+
+      // Check if user exists
+      const user = await User.findBy('id', userId)
+      if (!user) {
+        return sendErrorResponse(response, 404, 'User not found')
+      }
+
+      // Validate request data
+      const payload = await request.validateUsing(updateUserValidator)
+
+      // Handle avatar update if a new file was uploaded
+      let avatarUrl = undefined
+      if (request.file('avatar')) {
+        const avatar = request.file('avatar')
+        if (avatar && avatar.tmpPath) {
+          const result = await uploadImage(avatar.tmpPath)
+          avatarUrl = result.url
+        }
+      }
+
+      // Create update payload with all allowed fields
+      const updatePayload = {
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        ...(avatarUrl ? { avatar: avatarUrl } : {}),
+      }
+
+      // Update user
+      await user.merge(updatePayload).save()
+
+      // Fetch updated user with relations
+      const updatedUser = await User.query().where('id', userId).preload('role').first()
+
+      if (!updatedUser) {
+        return sendErrorResponse(response, 404, 'Failed to fetch updated user')
+      }
+
+      // Transform the response
+      const transformedUser = {
+        id: updatedUser.id,
+        first_name: updatedUser.first_name,
+        last_name: updatedUser.last_name,
+        phone_number: updatedUser.phone_number, // readonly
+        email: updatedUser.email, // readonly
+        avatar: updatedUser.avatar,
+        is_active: updatedUser.is_active,
+        created_at: updatedUser.createdAt,
+        updated_at: updatedUser.updatedAt,
+      }
+
+      return sendSuccessResponse(response, 'User details updated successfully', transformedUser)
+    } catch (error) {
+      console.error('Error updating user:', error)
+      return sendErrorResponse(response, 500, 'Error updating user details', error)
     }
   }
 
