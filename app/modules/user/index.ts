@@ -8,6 +8,7 @@ import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
 import Client from '#models/client'
+import Invoice from '#models/invoice'
 
 export const createUser = async (user: UserPayload, trx: TransactionClientContract) => {
   try {
@@ -155,22 +156,41 @@ export async function sendCampaignEmailToClient(
 export async function sendInvoiceEmailToClient(
   client: Client,
   dbTransaction: TransactionClientContract,
-  invoice: any
+  invoice: Invoice
 ) {
-  const clientRef = await Client.find(client.id, { client: dbTransaction })
+  const clientRef = await Client.find(client.id, {
+    client: dbTransaction,
+  })
+
   if (clientRef) {
+    // Load invoice items with their services
+    await invoice.load('items', (query) => {
+      query.preload('service')
+    })
+
+    // Helper function to format dates and calculations
+    const helpers = {
+      multiply: (a: number, b: number) => a * b,
+      getDaysDifference: (start: string, end: string) => {
+        const startDate = new Date(start)
+        const endDate = new Date(end)
+        return Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24))
+      },
+    }
+
     await mail.send((message) => {
       message
         .to(clientRef.email)
         .from('ayocandy1@gmail.com')
-        .subject('invoice')
+        .subject(`Invoice ${invoice.invoice_number} from PayPro`)
         .htmlView('emails/invoice_email', {
-          in: clientRef,
-          invoice,
+          client: clientRef,
+          invoice: invoice,
+          ...helpers,
         })
     })
   } else {
-    console.error('User not found')
+    console.error('Client not found')
   }
 }
 
