@@ -73,7 +73,7 @@ export default class InvoicesController {
       }
 
       await sendInvoiceEmailToClient(clientRef!, trx, invoice, paymentData.data.authorization_url)
-      return sendSuccessResponse(response, 'Invoices fetched successfully', invoiceData)
+      return sendSuccessResponse(response, 'Invoices generated successfully', invoiceData)
     })
   }
 
