@@ -9,10 +9,10 @@ export default class Payment extends BaseModel {
   declare id: number
 
   @column()
-  declare client_id: number
+  declare clientId: number
 
   @column()
-  declare invoice_id: number
+  declare invoiceId: number
 
   @column()
   declare amount: number

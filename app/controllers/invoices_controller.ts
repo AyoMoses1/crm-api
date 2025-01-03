@@ -13,7 +13,7 @@ import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
 import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import { DateTime } from 'luxon'
-import { createHmac } from 'crypto'
+import crypto from 'crypto'
 
 export default class InvoicesController {
   async generateInvoice({ request, response }: HttpContext) {
@@ -57,8 +57,8 @@ export default class InvoicesController {
 
       await Payment.create(
         {
-          client_id: client_id,
-          invoice_id: invoice.id,
+          clientId: client_id,
+          invoiceId: invoice.id,
           amount: totalAmount,
           status: 'pending',
           paystack_reference: paymentData.data.reference,
@@ -119,7 +119,8 @@ export default class InvoicesController {
 
   async handleWebhook({ request, response }: HttpContext) {
     try {
-      const hash = createHmac('sha512', env.get('PAYSTACK_SECRET_KEY'))
+      const hash = crypto
+        .createHmac('sha512', env.get('PAYSTACK_SECRET_KEY'))
         .update(JSON.stringify(request.body()))
         .digest('hex')
 
@@ -163,7 +164,7 @@ export default class InvoicesController {
 
           // Update invoice status
           const invoice = await Invoice.query({ client: trx })
-            .where('id', payment.invoice_id)
+            .where('id', payment.invoiceId)
             .first()
 
           if (invoice) {
