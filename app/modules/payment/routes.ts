@@ -9,6 +9,8 @@ router
 
     router.get('/payments/:id', [PaymentsController, 'getPaymentDetails'])
 
+    router.get('/payments', [PaymentsController, 'getAllPayments'])
+
     router.get('/invoice/:invoice_id/payments', [PaymentsController, 'getPaymentsByInvoice'])
   })
   .prefix('/api/v1')
