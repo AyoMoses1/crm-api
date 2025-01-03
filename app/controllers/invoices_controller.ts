@@ -1,13 +1,16 @@
 import Client from '#models/client'
 import Invoice from '#models/invoice'
 import InvoiceItem from '#models/invoice_item'
+import Payment from '#models/payment'
 import Service from '#models/service'
 import { sendInvoiceEmailToClient } from '#modules/user/index'
+import PaystackService from '#services/paystack'
 import { generateRandomInvoiceNumber, sendErrorResponse, sendSuccessResponse } from '#utils/index'
 import { invoiceGenerationValidator, updateInvoiceStatusValidator } from '#validators/invoice'
 import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { DateTime } from 'luxon'
 
 export default class InvoicesController {
   async generateInvoice({ request, response }: HttpContext) {
@@ -30,20 +33,47 @@ export default class InvoicesController {
         const amount = serviceRecord.price * service.quantity
         totalAmount += amount
 
-        await InvoiceItem.create({
-          invoiceId: invoice.id,
-          serviceId: serviceRecord.id,
-          quantity: service.quantity,
-          price: invoice.amount,
-        })
+        await InvoiceItem.create(
+          {
+            invoiceId: invoice.id,
+            serviceId: serviceRecord.id,
+            quantity: service.quantity,
+            price: invoice.amount,
+          },
+          { client: trx }
+        )
       }
 
       invoice.amount = totalAmount
       invoice.status = 'sent'
       await invoice.save()
 
-      await sendInvoiceEmailToClient(clientRef!, trx, invoice)
-      return sendSuccessResponse(response, 'Invoices fetched successfully', invoice)
+      const paystackService = new PaystackService()
+
+      const paymentData = await paystackService.initializeTransaction(invoice, clientRef!)
+
+      await Payment.create(
+        {
+          client_id: client_id,
+          invoice_id: invoice.id,
+          amount: totalAmount,
+          status: 'pending',
+          paystack_reference: paymentData.data.reference,
+          payment_method: 'paystack',
+          payment_date: DateTime.now(),
+          payment_channel: '',
+          paystack_transaction_id: '',
+        },
+        { client: trx }
+      )
+
+      const invoiceData = {
+        ...invoice.toJSON(),
+        payment_url: paymentData.data.authorization_url,
+      }
+
+      await sendInvoiceEmailToClient(clientRef!, trx, invoice, paymentData.data.authorization_url)
+      return sendSuccessResponse(response, 'Invoices fetched successfully', invoiceData)
     })
   }
 

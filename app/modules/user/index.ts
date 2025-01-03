@@ -156,7 +156,8 @@ export async function sendCampaignEmailToClient(
 export async function sendInvoiceEmailToClient(
   client: Client,
   dbTransaction: TransactionClientContract,
-  invoice: Invoice
+  invoice: Invoice,
+  paymentUrl: string
 ) {
   const clientRef = await Client.find(client.id, {
     client: dbTransaction,
@@ -186,6 +187,7 @@ export async function sendInvoiceEmailToClient(
         .htmlView('emails/invoice_email', {
           client: clientRef,
           invoice: invoice,
+          url: paymentUrl,
           ...helpers,
         })
     })

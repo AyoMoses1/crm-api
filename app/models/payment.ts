@@ -24,6 +24,15 @@ export default class Payment extends BaseModel {
   declare payment_method: string | null
 
   @column()
+  declare paystack_reference: string
+
+  @column()
+  declare paystack_transaction_id: string
+
+  @column()
+  declare payment_channel: string
+
+  @column()
   declare status: 'pending' | 'completed' | 'failed'
 
   @column.dateTime({ autoCreate: true })

@@ -44,4 +44,6 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Variables for configuring ally package
   |----------------------------------------------------------
   */
+
+  PAYSTACK_SECRET_KEY: Env.schema.string(),
 })
