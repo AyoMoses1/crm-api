@@ -171,4 +171,62 @@ export default class UsersController {
       return sendErrorResponse(response, 500, 'Error fetching user details', error)
     }
   }
+
+  async toggleUserActivation({ params, response }: HttpContext) {
+    try {
+      const userId = params.id
+
+      // Check if user exists
+      const user = await User.findBy('id', userId)
+      if (!user) {
+        return sendErrorResponse(response, 404, 'User not found')
+      }
+
+      // Use transaction for consistent updates
+      const updatedUser = await db.transaction(async (trx) => {
+        // Toggle the is_active status
+        await user.merge({ is_active: !user.is_active }).save()
+
+        // Fetch updated user with relations
+        const updatedUser = await User.query({ client: trx })
+          .where('id', userId)
+          .preload('role')
+          .first()
+
+        return updatedUser
+      })
+
+      if (!updatedUser) {
+        return sendErrorResponse(response, 404, 'Failed to fetch updated user')
+      }
+
+      // Transform the response
+      const transformedUser = {
+        id: updatedUser.id,
+        first_name: updatedUser.first_name,
+        last_name: updatedUser.last_name,
+        phone_number: updatedUser.phone_number,
+        email: updatedUser.email,
+        avatar: updatedUser.avatar,
+        is_active: updatedUser.is_active,
+        created_at: updatedUser.createdAt,
+        updated_at: updatedUser.updatedAt,
+        role: updatedUser.role
+          ? {
+              id: updatedUser.role.id,
+              role_id: updatedUser.role.role_id,
+            }
+          : null,
+      }
+
+      const message = updatedUser.is_active
+        ? 'User activated successfully'
+        : 'User deactivated successfully'
+
+      return sendSuccessResponse(response, message, transformedUser)
+    } catch (error) {
+      console.error('Error toggling user activation:', error)
+      return sendErrorResponse(response, 500, 'Error updating user activation status', error)
+    }
+  }
 }

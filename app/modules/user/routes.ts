@@ -7,5 +7,6 @@ router
     router.get('/users', [UserController, 'getAllUsers'])
     router.get('/users/:id', [UserController, 'getUserDetails'])
     router.put('/users/:id', [UserController, 'updateUser'])
+    router.patch('/users/:id/toggle-activation', [UserController, 'toggleUserActivation'])
   })
   .prefix('/api/v1')
